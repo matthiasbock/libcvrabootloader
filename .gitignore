@@ -1,0 +1,15 @@
+# Generated
+*.o
+*.a
+*.so
+*.out
+*.elf
+*.bin
+test/test
+test/datagram
+
+# Eclipse
+.settings
+.project
+.cproject
+.metadata
