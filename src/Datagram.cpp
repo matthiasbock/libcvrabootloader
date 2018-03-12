@@ -1,15 +1,19 @@
 
 #include <Datagram.hpp>
+#include <stdio.h>
+#include <stdlib.h>
 
 
-Datagram::Datagram() {};
+Datagram::Datagram() {}
 
 
-Datagram::~Datagram() {};
+Datagram::~Datagram() {}
 
 
 void Datagram::inputByte(uint8_t b)
 {
+    printf("Constructing datagram: Adding one byte at index %d...\n", input_cursor);
+
     // Version
     if (input_cursor == 0)
     {
@@ -39,10 +43,11 @@ void Datagram::inputByte(uint8_t b)
         {
             free(destination_nodes);
         }
-        destination_nodes = malloc(b);
+        destination_nodes = (uint8_t*) malloc(b);
         if (destination_nodes == NULL)
         {
             printf("Error: Failed to allocate %d bytes for destination_nodes.\n", b);
+            return;
         }
         input_cursor++;
         return;
@@ -54,7 +59,12 @@ void Datagram::inputByte(uint8_t b)
     // Array of destination nodes
     if (input_cursor <= index_last_destination_node)
     {
-        data[input_cursor - index_first_destination_node] = b;
+        if (destination_nodes == NULL)
+        {
+            printf("Error: Datagram's destination_nodes array is suddenly NULL.\n");
+            return;
+        }
+        destination_nodes[input_cursor - index_first_destination_node] = b;
         input_cursor++;
         return;
     }
@@ -67,7 +77,7 @@ void Datagram::inputByte(uint8_t b)
         {
             free(data);
         }
-        data = malloc(b);
+        data = (uint8_t*) malloc(b);
         input_cursor++;
         return;
     }
@@ -78,6 +88,11 @@ void Datagram::inputByte(uint8_t b)
     // Data
     if (input_cursor <= index_last_data_byte)
     {
+        if (data == NULL)
+        {
+            printf("Error: Datagram's data buffer is suddenly NULL.\n");
+            return;
+        }
         data[input_cursor - index_first_data_byte] = b;
         input_cursor++;
         return;

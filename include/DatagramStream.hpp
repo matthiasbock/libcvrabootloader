@@ -32,5 +32,5 @@ class DatagramStream
     /**
      * Append data to the current datagram
      */
-    ostream& operator<<(ostream& stream, char* data);
+//    ostream<char>& operator<<(ostream& stream, char* data);
 };

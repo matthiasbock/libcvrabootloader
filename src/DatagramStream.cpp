@@ -2,7 +2,7 @@
 #include <DatagramStream.hpp>
 
 
-DatagramStream::DatagramStream() {};
+DatagramStream::DatagramStream() {}
 
 
 DatagramStream::~DatagramStream()
@@ -11,9 +11,10 @@ DatagramStream::~DatagramStream()
     {
         delete datagram;
     }
-};
+}
 
 
+/*
 ostream& operator<<(ostream& stream)
 {
     if (datagram == NULL)
@@ -27,3 +28,4 @@ ostream& operator<<(ostream& stream)
 
     return new ostream();
 }
+*/

@@ -6,13 +6,15 @@
 
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define CAN_DATAGRAM_VERSION 1
 
 
 class Datagram
 {
-  private:
+//  private:
+  public:
     /**
      * 8-bit datagram version
      * must equal CAN_DATAGRAM_VERSION
@@ -49,7 +51,7 @@ class Datagram
      */
     uint32_t input_cursor = 0;
 
-  public:
+//  public:
     Datagram();
     ~Datagram();
 
