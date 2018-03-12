@@ -37,7 +37,7 @@ int main()
             // Version
             0x02,
             // CRC
-            0x12, 0x34, 0x56, 0x67,
+            0x12, 0x34, 0x56, 0x78,
             // Destination node count
             0x01,
             // Destination nodes
@@ -45,7 +45,7 @@ int main()
             // Data length
             0x04,
             // Data
-            0x12, 0x34, 0x56, 0x67,
+            0x12, 0x34, 0x56, 0x78,
             // Trailing data
             0x00
     };
@@ -62,7 +62,17 @@ int main()
     /*
      * Evaluate result
      */
-    assert("version", d->version == test_data[0]);
+    assert("Version", d->version == 2);
+    assert("CRC", d->crc == 0x12345678);
+    assert("Destination node count", d->destination_nodes_len == 1);
+    assert("Destination node 1", d->destination_nodes[0] == 0x42);
+    assert("Data length", d->data_len == 4);
+    assert("Data integrity",
+           d->data[0] == 0x12 &&
+           d->data[1] == 0x34 &&
+           d->data[2] == 0x56 &&
+           d->data[3] == 0x78
+           );
 
     if (!assertion_failed)
         printf("All assertions passed.\n");

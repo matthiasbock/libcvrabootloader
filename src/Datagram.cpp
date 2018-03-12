@@ -12,7 +12,7 @@ Datagram::~Datagram() {}
 
 void Datagram::inputByte(uint8_t b)
 {
-    printf("Constructing datagram: Adding one byte at index %d...\n", input_cursor);
+//    printf("Constructing datagram: Adding one byte at index %d...\n", input_cursor);
 
     // Version
     if (input_cursor == 0)
