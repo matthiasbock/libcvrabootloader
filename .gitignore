@@ -5,8 +5,6 @@
 *.out
 *.elf
 *.bin
-test/test
-test/datagram
 
 # Eclipse
 .settings
