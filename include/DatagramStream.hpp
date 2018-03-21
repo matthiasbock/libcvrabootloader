@@ -5,9 +5,11 @@
  * whenever a complete datagram has been received.
  */
 
-#include <iostream>
-#include <Datagram.hpp>
+#ifndef _DATAGRAM_STREAM
+#define _DATAGRAM_STREAM
 
+#include <CANFrame.h>
+#include <Datagram.hpp>
 
 /**
  * Structure of the handler to be called,
@@ -32,5 +34,7 @@ class DatagramStream
     /**
      * Append data to the current datagram
      */
-//    ostream<char>& operator<<(ostream& stream, char* data);
+    void operator<<(can_frame_t*);
 };
+
+#endif

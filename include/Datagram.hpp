@@ -4,6 +4,8 @@
  * structure of a CVRA CAN bootloader datagram.
  */
 
+#ifndef _DATAGRAM
+#define _DATAGRAM
 
 #include <stdint.h>
 #include <stddef.h>
@@ -59,6 +61,7 @@ class Datagram
      * Inputs a byte into the datagram
      */
     void inputByte(uint8_t);
+    void operator<<(uint8_t b);
 
     /**
      * Returns true if the datagram is complete
@@ -75,3 +78,5 @@ class Datagram
      */
     uint32_t computeCRC();
 };
+
+#endif

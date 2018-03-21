@@ -103,6 +103,12 @@ void Datagram::inputByte(uint8_t b)
 }
 
 
+void Datagram::operator<<(uint8_t b)
+{
+    inputByte(b);
+}
+
+
 bool Datagram::isComplete()
 {
     return (destination_nodes != NULL && data != NULL && input_cursor >= 1+4+1+destination_nodes_len+1+data_len);

@@ -14,18 +14,18 @@ DatagramStream::~DatagramStream()
 }
 
 
-/*
-ostream& operator<<(ostream& stream)
+void DatagramStream::operator<<(can_frame_t* frame)
 {
     if (datagram == NULL)
     {
         datagram = new Datagram();
     }
 
-    // TODO: Append stream bytes to datagram
-    // datagram.appendBytesToBuffer(streamBytes);
-    // if (datagram.isComplete()) { yield };
+    if (frame->can_dlc == 0)
+        return;
 
-    return new ostream();
+    for (uint8_t i=0; i < frame->can_dlc; i++)
+    {
+        *(this->datagram) << frame->data[i];
+    }
 }
-*/
