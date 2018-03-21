@@ -43,6 +43,7 @@ CPPFLAGS += -fPIC
 CPPFLAGS += -I$(INCDIR)
 CPPFLAGS += -L.
 CPPFLAGS += -lpthread
+CPPFLAGS += -lz
 
 RM = rm -f
 
@@ -86,4 +87,4 @@ test: $(TESTDIR)/$(TESTNAME).elf
 	$(CPP) $(CPPFLAGS) -c $^ -o $@
 
 clean:
-	@$(RM) $(SRCDIR)/*.o lib$(LIBNAME).so $(TESTDIR)/*.o $(TESTDIR)/$(TESTNAME).elf
+	@$(RM) $(CLIENTNAME).elf $(SRCDIR)/*.o lib$(LIBNAME).so $(TESTDIR)/*.o $(TESTDIR)/$(TESTNAME).elf

@@ -16,7 +16,7 @@ void datagram_handler(Datagram* d)
 
     if (d->isValid())
     {
-        printf("It's even valid!\n");
+        printf("Wow, it's valid!\n");
     }
     else
     {
@@ -34,7 +34,7 @@ void stream_handler(can_frame_t* frame)
         d->datagram_complete_handler = &datagram_handler;
     }
 
-    printf("Received CAN frame with ID %#04x.\n", frame->can_id);
+//    printf("Received CAN frame with ID %#04x.\n", frame->can_id);
 
     switch (frame->can_id)
     {

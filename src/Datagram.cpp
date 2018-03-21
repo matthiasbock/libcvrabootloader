@@ -2,6 +2,7 @@
 #include <Datagram.hpp>
 #include <stdio.h>
 #include <stdlib.h>
+#include <zlib.h>
 
 
 Datagram::Datagram() {}
@@ -46,7 +47,7 @@ void Datagram::inputByte(uint8_t b)
             free(destination_nodes);
         }
 
-        printf("Datagram destination node count: %d\n", destination_nodes_len);
+//        printf("Datagram destination node count: %d\n", destination_nodes_len);
 
         destination_nodes = (uint8_t*) malloc(b);
         if (destination_nodes == NULL)
@@ -72,7 +73,7 @@ void Datagram::inputByte(uint8_t b)
         uint8_t destination_node_index = input_cursor - index_first_destination_node;
         destination_nodes[destination_node_index] = b;
 
-        printf("Datagram destination node %d: %d\n", destination_node_index, destination_nodes[destination_node_index]);
+//        printf("Datagram destination node %d: %d\n", destination_node_index, destination_nodes[destination_node_index]);
 
         input_cursor++;
         return;
@@ -101,7 +102,7 @@ void Datagram::inputByte(uint8_t b)
     {
         data_len |= b;
 
-        printf("Datagram payload size: %d\n", data_len);
+//        printf("Datagram payload size: %d\n", data_len);
 
         if (data != NULL)
         {
@@ -129,15 +130,17 @@ void Datagram::inputByte(uint8_t b)
         uint32_t data_index = input_cursor - index_first_data_byte;
         data[data_index] = b;
 
-        if (input_cursor == index_last_data_byte)
+        if (input_cursor >= index_last_data_byte)
         {
+//            printf("Datagram completed.\n");
+
             if (!datagram_is_complete)
             {
+                datagram_is_complete = true;
                 if (datagram_complete_handler != NULL)
                 {
                     (*datagram_complete_handler)(this);
                 }
-                datagram_is_complete = true;
             }
         }
 
@@ -214,7 +217,31 @@ bool Datagram::isValid()
 
 uint32_t Datagram::computeCRC()
 {
-    // TODO
-    return 0;
+    uint32_t calculated_crc = crc32(0L, Z_NULL, 0);
+
+    uint32_t length = 1 + destination_nodes_len + 4 + data_len;
+    uint8_t* buffer = (uint8_t*) malloc(length);
+//    memset(buffer, 0, length);
+
+    buffer[0] = destination_nodes_len;
+    uint8_t* b = buffer + 1;
+    for (uint8_t i=0; i<destination_nodes_len; i++)
+    {
+        *(b++) = destination_nodes[i];
+    }
+    *(b++) = data_len >> 24;
+    *(b++) = (data_len >> 16) & 0xFF;
+    *(b++) = (data_len >> 8) & 0xFF;
+    *(b++) = data_len & 0xFF;
+    for (uint32_t i=0; i<data_len; i++)
+    {
+        *(b++) = data[i];
+    }
+
+    calculated_crc = crc32(calculated_crc, buffer, length);
+
+//    printf("Calculated CRC: %#010x\n", calculated_crc);
+
+    return calculated_crc;
 }
 
