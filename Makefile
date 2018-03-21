@@ -27,15 +27,17 @@ TESTOBJS = $(TESTSRCS:.cpp=.o)
 #
 CPP = g++
 CPPFLAGS += -fdiagnostics-color=auto
-CPPFLAGS += -I$(INCDIR)
-CPPFLAGS += -L.
 CPPFLAGS += -std=gnu++14
 CPPFLAGS += -Wall -Wextra -pedantic
-CPPFLAGS += -lpthread
 CPPFLAGS += -g
 CPPFLAGS += -O3
+
 # Required for linking to shared library:
 CPPFLAGS += -fPIC
+
+CPPFLAGS += -I$(INCDIR)
+CPPFLAGS += -L.
+CPPFLAGS += -lpthread
 
 RM = rm -f
 

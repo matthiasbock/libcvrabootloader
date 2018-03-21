@@ -1,6 +1,8 @@
 /**
  * @file
- * This program tests the class Datagram.
+ * This program tests the class Datagram by inputing
+ * byte-by-byte of a test datagram and check,
+ * whether the datagram values are initialized correctly.
  */
 
 #include <stdint.h>
