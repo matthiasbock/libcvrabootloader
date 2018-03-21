@@ -9,13 +9,37 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <CANFrame.h>
 
 #define CAN_DATAGRAM_VERSION 1
+
+/**
+ * Structure of the handler to be called,
+ * when a complete datagram has been received
+ */
+class Datagram;
+typedef void (*datagram_complete_handler_t)(Datagram* datagram);
 
 
 class Datagram
 {
-//  private:
+  private:
+    /**
+     * Pointer to array of data bytes
+     */
+    uint8_t* data = NULL;
+
+    /**
+     * Buffer position where to write the next input byte
+     */
+    uint32_t input_cursor = 0;
+
+    /**
+     * True, if all bytes of a datagram have been received
+     * regardless of whether the datagram is valid or not
+     */
+    bool datagram_is_complete = false;
+
   public:
     /**
      * 8-bit datagram version
@@ -33,6 +57,7 @@ class Datagram
      * is also number of bytes to malloc() for destination_nodes
      */
     uint8_t destination_nodes_len = 0;
+
     /**
      * Pointer to array of destination node IDs
      */
@@ -43,17 +68,13 @@ class Datagram
      * is also number of bytes to malloc() for data
      */
     uint32_t data_len = 0;
-    /**
-     * Pointer to array of data bytes
-     */
-    uint8_t* data = NULL;
 
     /**
-     * Position where to write the next input byte
+     * Function to execute, when a complete datagram has been received
      */
-    uint32_t input_cursor = 0;
+    datagram_complete_handler_t datagram_complete_handler = NULL;
 
-//  public:
+
     Datagram();
     ~Datagram();
 
@@ -61,7 +82,26 @@ class Datagram
      * Inputs a byte into the datagram
      */
     void inputByte(uint8_t);
+
+    /**
+     * Use stream operator to input bytes into the datagram
+     */
     void operator<<(uint8_t b);
+
+    /**
+     * Append the payload of a CAN frame
+     */
+    void operator<<(can_frame_t*);
+
+    /**
+     * Clear all datagram properties and buffers
+     */
+    void reset();
+
+    /**
+     * Return a byte from the datagram payload buffer
+     */
+    uint8_t getPayloadByte(uint8_t index);
 
     /**
      * Returns true if the datagram is complete
@@ -69,14 +109,14 @@ class Datagram
     bool isComplete();
 
     /**
-     * Returns true if the datagram is valid (complete and CRC match)
-     */
-    bool isValid();
-
-    /**
      * Computes the CRC32 of the datagram
      */
     uint32_t computeCRC();
+
+    /**
+     * Returns true if the datagram is valid (complete and CRC match)
+     */
+    bool isValid();
 };
 
 #endif

@@ -70,10 +70,10 @@ int main()
     assert("Destination node 1", d->destination_nodes[0] == 0x42);
     assert("Data length", d->data_len == 4);
     assert("Data integrity",
-           d->data[0] == 0x12 &&
-           d->data[1] == 0x34 &&
-           d->data[2] == 0x56 &&
-           d->data[3] == 0x78
+           d->getPayloadByte(0) == 0x12 &&
+           d->getPayloadByte(1) == 0x34 &&
+           d->getPayloadByte(2) == 0x56 &&
+           d->getPayloadByte(3) == 0x78
            );
 
     if (!assertion_failed)
