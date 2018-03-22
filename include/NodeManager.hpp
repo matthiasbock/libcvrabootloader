@@ -17,6 +17,8 @@
 #define MAX_NODE_ID                 0x07f
 #define NODE_ID_DATAGRAM_START_MASK 0x080
 
+typedef void (*datagram_received_handler_t)(uint8_t sourceNodeId, Datagram* datagram);
+
 
 class NodeManager: public CANFrameParser
 {
@@ -36,7 +38,7 @@ class NodeManager: public CANFrameParser
      * Pointers to functions to call, when the corresponding ID
      * has received a complete and valid datagram
      */
-    datagram_complete_handler_t datagram_rx_handler[MAX_NODE_ID];
+    datagram_received_handler_t datagram_rx_handler[MAX_NODE_ID];
 
     NodeManager(CANAdapter*);
     ~NodeManager();

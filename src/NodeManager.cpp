@@ -75,9 +75,10 @@ void NodeManager::parse_frame(can_frame_t* frame)
 
     if (dt->isValid())
     {
+        // Execute datagram reception handler
         if (datagram_rx_handler[dt_id] != NULL)
         {
-            (*(datagram_rx_handler[dt_id]))(dt);
+            (*(datagram_rx_handler[dt_id]))(dt_id, dt);
         }
 
         dt->reset();

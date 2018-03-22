@@ -11,18 +11,9 @@ SocketCAN* can = NULL;
 NodeManager* manager = NULL;
 
 
-void bootloader_rx_handler_1(Datagram* d)
+void bootloader_rx_handler_1(uint8_t node_id, Datagram* d)
 {
-    printf("Received a datagram.\n");
-
-    if (d->isValid())
-    {
-        printf("Wow, it's valid!\n");
-    }
-    else
-    {
-        printf("It's not valid though.\n");
-    }
+    printf("Received a datagram from node ID %#02x.\n", node_id);
 }
 
 
@@ -31,7 +22,6 @@ int main()
     can = new SocketCAN();
     manager = new NodeManager(can);
     manager->datagram_rx_handler[1] = &bootloader_rx_handler_1;
-    can->parser = manager;
 
     can->open("can0");
 
