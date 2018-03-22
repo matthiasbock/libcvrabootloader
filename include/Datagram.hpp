@@ -30,17 +30,17 @@ class Datagram
     uint8_t* data = NULL;
 
     /**
-     * Buffer position where to write the next input byte
-     */
-    uint32_t input_cursor = 0;
-
-    /**
      * True, if all bytes of a datagram have been received
      * regardless of whether the datagram is valid or not
      */
     bool datagram_is_complete = false;
 
   public:
+    /**
+     * Buffer position where to write the next input byte
+     */
+    uint32_t input_cursor = 0;
+
     /**
      * 8-bit datagram version
      * must equal CAN_DATAGRAM_VERSION

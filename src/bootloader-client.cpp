@@ -2,15 +2,16 @@
 #include <stdio.h>
 #include <SocketCAN.h>
 #include <Datagram.hpp>
+#include <NodeManager.hpp>
 #include <time.h>
-
-
-SocketCAN* can;
 
 using namespace std;
 
+SocketCAN* can = NULL;
+NodeManager* manager = NULL;
 
-void datagram_handler(Datagram* d)
+
+void bootloader_rx_handler_1(Datagram* d)
 {
     printf("Received a datagram.\n");
 
@@ -25,39 +26,14 @@ void datagram_handler(Datagram* d)
 }
 
 
-void stream_handler(can_frame_t* frame)
-{
-    static Datagram* d = NULL;
-    if (d == NULL)
-    {
-        d = new Datagram();
-        d->datagram_complete_handler = &datagram_handler;
-    }
-
-//    printf("Received CAN frame with ID %#04x.\n", frame->can_id);
-
-    switch (frame->can_id)
-    {
-        case 0x81:
-            d->reset();
-            *d << frame;
-            break;
-
-        case 0x01:
-            *d << frame;
-            break;
-
-        default:
-            break;
-    }
-}
-
-
 int main()
 {
     can = new SocketCAN();
+    manager = new NodeManager(can);
+    manager->datagram_rx_handler[1] = &bootloader_rx_handler_1;
+    can->parser = manager;
+
     can->open("can0");
-    can->reception_handler = &stream_handler;
 
     sleep(5);
 

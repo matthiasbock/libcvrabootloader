@@ -34,7 +34,7 @@ void Datagram::inputByte(uint8_t b)
     // Destination nodes length/count
     if (input_cursor == 5)
     {
-        printf("Datagram CRC: %#010x\n", crc);
+//        printf("Datagram CRC: %#010x\n", crc);
 
         if (b == 0)
         {
