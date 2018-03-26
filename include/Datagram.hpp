@@ -10,8 +10,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <CANFrame.h>
+#include <Command.hpp>
 
-#define CAN_DATAGRAM_VERSION 1
+#define DATAGRAM_VERSION        1
+#define DATAGRAM_HEADER_SIZE    5
 
 /**
  * Structure of the handler to be called,
@@ -45,7 +47,7 @@ class Datagram
      * 8-bit datagram version
      * must equal CAN_DATAGRAM_VERSION
      */
-    uint8_t version = CAN_DATAGRAM_VERSION;
+    uint8_t version = DATAGRAM_VERSION;
 
     /**
      * 32-bit datagram content checksum
@@ -94,6 +96,11 @@ class Datagram
     void operator<<(can_frame_t*);
 
     /**
+     * Append a command MsgPack to the data buffer
+     */
+    void operator<<(Command* cmd);
+
+    /**
      * Clear all datagram properties and buffers
      */
     void reset();
@@ -109,9 +116,41 @@ class Datagram
     bool isComplete();
 
     /**
+     * Return the number of bytes this datagram occupies when assembled
+     */
+    uint32_t getSize();
+
+    /**
+     * Writes the datagram to a buffer
+     *
+     * Make sure, you have allocated at least getSize() bytes for buffer.
+     */
+    void writeToBuffer(uint8_t* buffer);
+
+    /**
+     * Allocate space for a buffer and write datagram to this buffer
+     *
+     * @return  Pointer to created buffer
+     */
+    uint8_t* asBuffer();
+
+    /**
      * Computes the CRC32 of the datagram
      */
     uint32_t computeCRC();
+
+    /**
+     * Compute a CRC assuming the required buffer
+     * (without the datagram header)
+     * has already been written
+     */
+    uint32_t computeCRC(uint8_t* buffer, uint32_t size);
+
+    /**
+     * Compute and insert CRC into already prepared datagram buffer
+     * (including the datagram header)
+     */
+    void insetCRC(uint8_t* buffer, uint32_t size);
 
     /**
      * Returns true if the datagram is valid (complete and CRC match)

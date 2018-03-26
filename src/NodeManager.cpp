@@ -1,6 +1,7 @@
 
 #include <NodeManager.hpp>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 NodeManager::NodeManager(CANAdapter* adapter)
@@ -83,4 +84,37 @@ void NodeManager::parse_frame(can_frame_t* frame)
 
         dt->reset();
     }
+}
+
+
+void NodeManager::sendCommand(Command* cmd, uint8_t* destinations, uint8_t destination_count)
+{
+    Datagram* dt = new Datagram();
+
+    dt->destination_nodes = destinations;
+    dt->destination_nodes_len = destination_count;
+    *dt << cmd;
+
+    uint32_t size = dt->getSize();
+    uint8_t* buffer = dt->asBuffer();
+    dt->insetCRC(buffer, size);
+
+    uint32_t cursor = 0;
+    bool first_frame = true;
+    can_frame_t frame;
+
+    while (cursor < size)
+    {
+        uint8_t remaining = size - cursor;
+        frame.can_dlc = (remaining > 8) ? 8 : remaining;
+        frame.can_id = first_frame ? 0x080 : 0x000;
+        for (uint8_t i=0; i<frame.can_dlc; i++)
+        {
+            frame.data[i] = buffer[cursor++];
+        }
+        adapter->transmit(&frame);
+        first_frame = false;
+    }
+
+    free(buffer);
 }

@@ -1,9 +1,12 @@
 
 #include <stdio.h>
+#include <time.h>
 #include <SocketCAN.h>
 #include <Datagram.hpp>
 #include <NodeManager.hpp>
-#include <time.h>
+#include <Command.hpp>
+#include <CommandPing.hpp>
+
 
 using namespace std;
 
@@ -25,7 +28,12 @@ int main()
 
     can->open("can0");
 
-    sleep(5);
+    Command* cmd = new CommandPing();
+    uint8_t nodes[] = {1};
+    manager->sendCommand(cmd, nodes, 1);
+    delete cmd;
+
+    sleep(3);
 
     delete can;
     return 0;

@@ -43,7 +43,12 @@ class NodeManager: public CANFrameParser
     NodeManager(CANAdapter*);
     ~NodeManager();
 
-    void parse_frame(can_frame_t*);
+    void parse_frame(can_frame_t* frame);
+
+    /**
+     * Create a datagram with the given command and send it
+     */
+    void sendCommand(Command* cmd, uint8_t* destinations, uint8_t destination_count);
 };
 
 

@@ -11,6 +11,3 @@ Command::Command() {}
 
 
 Command::~Command() {}
-
-
-uint32_t Command::encode(uint8_t* buffer, uint32_t* size, uint32_t max_size) {}

@@ -171,12 +171,30 @@ void Datagram::operator<<(can_frame_t* frame)
 }
 
 
+void Datagram::operator<<(Command* cmd)
+{
+    const uint8_t DATA_DEFAULT_SIZE = 3;
+
+    // Discard old payload
+    if (data != NULL)
+    {
+        free(data);
+    }
+
+    // The MsgPack packer will reallocate more automatically, if needed.
+    data = (uint8_t*) malloc(DATA_DEFAULT_SIZE);
+
+    // Invoke MsgPack packer
+    data_len = cmd->encode(data, DATA_DEFAULT_SIZE);
+}
+
+
 void Datagram::reset()
 {
     input_cursor = 0;
     datagram_is_complete = false;
 
-    version = CAN_DATAGRAM_VERSION;
+    version = DATAGRAM_VERSION;
     crc = 0;
     destination_nodes_len = 0;
     if (destination_nodes != NULL)
@@ -215,16 +233,25 @@ bool Datagram::isValid()
 }
 
 
-uint32_t Datagram::computeCRC()
+uint32_t Datagram::getSize()
 {
-    uint32_t calculated_crc = crc32(0L, Z_NULL, 0);
+    return DATAGRAM_HEADER_SIZE + 1 + destination_nodes_len + 4 + data_len;
+}
 
-    uint32_t length = 1 + destination_nodes_len + 4 + data_len;
-    uint8_t* buffer = (uint8_t*) malloc(length);
-//    memset(buffer, 0, length);
 
-    buffer[0] = destination_nodes_len;
-    uint8_t* b = buffer + 1;
+void Datagram::writeToBuffer(uint8_t* buffer)
+{
+    if (buffer == NULL)
+        return;
+
+    // Write datagram to buffer
+    uint8_t* b = buffer;
+    *(b++) = version;
+    *(b++) = crc >> 24;
+    *(b++) = (crc >> 16) & 0xFF;
+    *(b++) = (crc >> 8) & 0xFF;
+    *(b++) = crc & 0xFF;
+    *(b++) = destination_nodes_len;
     for (uint8_t i=0; i<destination_nodes_len; i++)
     {
         *(b++) = destination_nodes[i];
@@ -237,11 +264,60 @@ uint32_t Datagram::computeCRC()
     {
         *(b++) = data[i];
     }
-
-    calculated_crc = crc32(calculated_crc, buffer, length);
-
-//    printf("Calculated CRC: %#010x\n", calculated_crc);
-
-    return calculated_crc;
 }
 
+
+uint8_t* Datagram::asBuffer()
+{
+    // Allocate buffer
+    uint8_t* buffer = (uint8_t*) malloc(getSize());
+
+    if (buffer == NULL)
+        return NULL;
+
+    // Write datagram to buffer
+    writeToBuffer(buffer);
+
+    return buffer;
+}
+
+
+uint32_t Datagram::computeCRC()
+{
+    // Allocate memory and write datagram to buffer
+    uint32_t size = getSize();
+    uint8_t* buffer = asBuffer();
+
+    // Compute CRC over buffer skipping the datagram header
+    crc = computeCRC(buffer + DATAGRAM_HEADER_SIZE, size - DATAGRAM_HEADER_SIZE);
+
+    free(buffer);
+    return crc;
+}
+
+
+uint32_t Datagram::computeCRC(uint8_t* buffer, uint32_t size)
+{
+    // Initialize CRC32
+    uint32_t _crc = crc32(0L, Z_NULL, 0);
+
+    // Calculate CRC32 of the buffer
+    _crc = crc32(_crc, buffer, size);
+
+    printf("Calculated CRC: %#010x\n", _crc);
+
+    return _crc;
+}
+
+
+void Datagram::insetCRC(uint8_t* buffer, uint32_t size)
+{
+    // Compute CRC over buffer skipping the datagram header
+    uint32_t _crc = computeCRC(buffer + DATAGRAM_HEADER_SIZE, size - DATAGRAM_HEADER_SIZE);
+
+    // Insert CRC into buffer
+    buffer[1] = _crc >> 24;
+    buffer[2] = (_crc >> 16) & 0xFF;
+    buffer[3] = (_crc >> 8) & 0xFF;
+    buffer[4] = _crc & 0xFF;
+}
